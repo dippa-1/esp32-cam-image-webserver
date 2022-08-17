@@ -40,11 +40,24 @@ String header;
 #define HREF_GPIO_NUM     23
 #define PCLK_GPIO_NUM     22
 
+void WiFiStationDisconnected(WiFiEvent_t event, WiFiEventInfo_t info){
+  Serial.println("Disconnected from WiFi access point");
+  Serial.print("WiFi lost connection. Reason: ");
+  Serial.println(info.wifi_sta_disconnected.reason);
+  Serial.println("Trying to Reconnect");
+  WiFi.begin(ssid, password);
+}
+
 void setup() {
   WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0); 
   Serial.begin(115200);
 
+  WiFi.disconnect(true); // delete old config ?
+  delay(1000);
+
+
   WiFi.mode(WIFI_STA);
+  WiFi.onEvent(WiFiStationDisconnected, WiFiEvent_t::ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
   Serial.println();
   Serial.print("Connecting to ");
   Serial.println(ssid);
